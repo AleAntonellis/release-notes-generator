@@ -43,5 +43,27 @@ namespace ReleaseNotesGenerator
 
             return workItems;
         }
+
+        public async Task<WorkItem?> GetParentWorkItemAsync(int workItemId)
+        {
+            var credentials = new VssBasicCredential(_adoUsername, _personalAccessToken);
+            var connection = new VssConnection(new Uri(_adoUrl), credentials);
+            var workItemTrackingClient = await connection.GetClientAsync<WorkItemTrackingHttpClient>();
+
+            var workItem = await workItemTrackingClient.GetWorkItemAsync(workItemId, expand: WorkItemExpand.Relations);
+
+            if (workItem.Relations != null)
+            {
+                var parentRelation = workItem.Relations.FirstOrDefault(r => r.Rel == "System.LinkTypes.Hierarchy-Reverse");
+                if (parentRelation != null)
+                {
+                    var parentId = int.Parse(parentRelation.Url.Split('/').Last());
+                    var parentWorkItem = await workItemTrackingClient.GetWorkItemAsync(parentId);
+                    return parentWorkItem;
+                }
+            }
+
+            return default;
+        }
     }
 }
