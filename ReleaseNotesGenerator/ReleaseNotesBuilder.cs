@@ -40,8 +40,9 @@ namespace ReleaseNotesGenerator
                     continue;
                 }
 
-                if (workItemsByParent.TryGetValue(parent, out var userStories))
+                if (workItemsByParent.Keys.FirstOrDefault(k => k.Id == parent.Id) != null)
                 {
+                    var userStories = workItemsByParent.First(w => w.Key.Id == parent.Id).Value;
                     if (!userStories.Any(w => w.Id == workItem.Id))
                         userStories.Add(workItem);
                 }
