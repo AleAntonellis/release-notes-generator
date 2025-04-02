@@ -33,7 +33,7 @@ namespace ReleaseNotesGenerator
             {
                 var workItemRefs = await gitClient.GetPullRequestWorkItemRefsAsync(_repositoryId, prId);
 
-                if (workItemRefs != null)
+                if (workItemRefs != null && workItemRefs.Any())
                 {
                     var workItemIds = workItemRefs.Select(wir => int.Parse(wir.Id)).ToArray();
                     var workItemsBatch = await workItemTrackingClient.GetWorkItemsAsync(workItemIds);
